@@ -1,35 +1,33 @@
 [versions]
 androidMinSdk = "23"
-androidTargetSdk = "36"
-androidCompileSdk = "36"
+androidTargetSdk = "37"
+androidCompileSdk = "37"
 
 quickie = "1.18.1"
 
 androidGradle = "8.13.2"
-kotlin = "2.3.0"
+kotlin = "2.4.10"
 
 appcompat = "1.7.1"
 core = "1.17.0"
 
-cameraX = "1.5.3"
-
-materialDesign = "1.13.0"
+cameraX = "1.6.1"
 
 detekt = "1.23.8"
-dokka = "2.1.0"
+dokka = "2.2.0"
 
-junit = "6.0.2"
+junit = "6.1.2"
 desugaring = "2.1.5"
 
 barcodeScanning = "17.3.0"
 barcodeScanningGms = "18.3.1"
-coil = "3.3.0"
-ezVcard = "0.12.1"
+coil = "3.5.0"
+ezVcard = "0.12.2"
 zxingCore = "3.5.4"
-material = "1.14.0-alpha09"
+material = "1.14.0"
 
 [libraries]
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+material = { module = "com.google.android.material:material", version.ref = "material" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "zxingCore" }
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
@@ -39,12 +37,12 @@ androidx-cameraPreview = { module = "androidx.camera:camera-view", version.ref =
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "core" }
 ez-vcard = { module = "com.googlecode.ez-vcard:ez-vcard", version.ref = "ezVcard" }
 
-google-materialDesign = { module = "com.google.android.material:material", version.ref = "materialDesign" }
 mlkit-barcodeScanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "barcodeScanning" }
 mlkit-barcodeScanningGms = { module = "com.google.android.gms:play-services-mlkit-barcode-scanning", version.ref = "barcodeScanningGms" }
 
 test-junitApi = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
 test-junitEngine = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+test-junitPlatformLauncher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
 
 desugaring = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugaring" }
 

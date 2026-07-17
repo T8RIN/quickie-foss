@@ -32,6 +32,11 @@ android {
   buildFeatures {
     viewBinding = true
   }
+  testOptions {
+    unitTests.all {
+      it.useJUnitPlatform()
+    }
+  }
 
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -57,6 +62,7 @@ dependencies {
 
   testImplementation(libs.test.junitApi)
   testRuntimeOnly(libs.test.junitEngine)
+  testRuntimeOnly(libs.test.junitPlatformLauncher)
   coreLibraryDesugaring(libs.desugaring)
   implementation(libs.material)
 

@@ -14,7 +14,9 @@ import com.google.zxing.maxicode.MaxiCodeReader
 import com.google.zxing.oned.MultiFormatOneDReader
 import com.google.zxing.pdf417.PDF417Reader
 import com.google.zxing.qrcode.QRCodeReader
+import java.nio.ByteBuffer
 import java.nio.charset.Charset
+import java.nio.charset.CodingErrorAction
 
 class MultiFormatReaderFixed : Reader {
   private var hints: MutableMap<DecodeHintType?, *>? = null
@@ -149,7 +151,10 @@ class MultiFormatReaderFixed : Reader {
       for (reader in readers) {
         try {
           val result = reader.decode(image, hints)
-          return if (reader is AztecReader || reader is DataMatrixReader) {
+          return if (
+            (reader is AztecReader || reader is DataMatrixReader) &&
+            hasExplicitEncodingArtifacts(result.text)
+          ) {
             Result(
               guessEncodingAndReencode(result.text),
               result.rawBytes,
@@ -169,22 +174,30 @@ class MultiFormatReaderFixed : Reader {
     throw NotFoundException.getNotFoundInstance()
   }
 
+  private fun hasExplicitEncodingArtifacts(code: String): Boolean {
+    if (code.any { it.code > 0xFF }) {
+      return false
+    }
+
+    val bytes = code.toByteArray(Charsets.ISO_8859_1)
+    if ((bytes.size > 4 && hasUTF32BOM(bytes)) || (bytes.size > 2 && hasUTF16BOM(bytes))) {
+      return true
+    }
+
+    if (bytes.none { it < 0 }) {
+      return false
+    }
+
+    return runCatching {
+      Charsets.UTF_8.newDecoder()
+        .onMalformedInput(CodingErrorAction.REPORT)
+        .onUnmappableCharacter(CodingErrorAction.REPORT)
+        .decode(ByteBuffer.wrap(bytes))
+    }.isSuccess
+  }
+
   private fun guessEncodingAndReencode(code: String): String {
     val bytes = code.toByteArray(Charsets.ISO_8859_1)
-
-    val ff = 0xFF.toByte()
-    val fe = 0xFE.toByte()
-    val ze = 0.toByte()
-
-    fun hasUTF32BOM(b: ByteArray): Boolean {
-      return (b[0] == ff && b[1] == fe && b[2] == ze && b[3] == ze) ||
-        (b[0] == ze && b[1] == ze && b[2] == fe && b[3] == ff)
-    }
-
-    fun hasUTF16BOM(b: ByteArray): Boolean {
-      return (b[0] == ff && b[1] == fe) ||
-        (b[0] == fe && b[1] == ff)
-    }
 
     if (bytes.size > 4 && hasUTF32BOM(bytes)) {
       return String(bytes, Charsets.UTF_32)
@@ -196,6 +209,21 @@ class MultiFormatReaderFixed : Reader {
 
     val zxingGuess = StringUtils.guessEncoding(bytes, hints)
     return String(bytes, Charset.forName(zxingGuess))
+  }
+
+  private fun hasUTF32BOM(bytes: ByteArray): Boolean {
+    val ff = 0xFF.toByte()
+    val fe = 0xFE.toByte()
+    val zero = 0.toByte()
+    return (bytes[0] == ff && bytes[1] == fe && bytes[2] == zero && bytes[3] == zero) ||
+      (bytes[0] == zero && bytes[1] == zero && bytes[2] == fe && bytes[3] == ff)
+  }
+
+  private fun hasUTF16BOM(bytes: ByteArray): Boolean {
+    val ff = 0xFF.toByte()
+    val fe = 0xFE.toByte()
+    return (bytes[0] == ff && bytes[1] == fe) ||
+      (bytes[0] == fe && bytes[1] == ff)
   }
 
   companion object {
