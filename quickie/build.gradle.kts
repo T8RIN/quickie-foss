@@ -2,7 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   alias(libs.plugins.android.library)
-  alias(libs.plugins.kotlin.android)
   alias(libs.plugins.kotlin.parcelize)
   alias(libs.plugins.kotlin.dokka)
   `maven-publish`
@@ -19,6 +18,11 @@ android {
   }
   buildFeatures {
     viewBinding = true
+  }
+  testOptions {
+    unitTests.all {
+      it.useJUnitPlatform()
+    }
   }
 
   flavorDimensions += "mlkit"
@@ -59,6 +63,7 @@ dependencies {
 
   testImplementation(libs.test.junitApi)
   testRuntimeOnly(libs.test.junitEngine)
+  testRuntimeOnly(libs.test.junitPlatformLauncher)
 
   coreLibraryDesugaring(libs.desugaring)
   implementation(libs.material)

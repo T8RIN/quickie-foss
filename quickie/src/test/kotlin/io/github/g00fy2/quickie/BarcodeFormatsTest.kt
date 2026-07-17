@@ -13,7 +13,7 @@ internal class BarcodeFormatsTest {
       .filter { it.type == Int::class.java }
       .filter { it.name.startsWith("FORMAT_") }
       .filter { it.name != "FORMAT_UNKNOWN" }
-      .associate { it.name to it.getInt(null) }
+      .associate { it.name.removePrefix("FORMAT_") to it.getInt(null) }
 
     val quickieBarcodeFormats: Map<String, Int> = BarcodeFormat.entries.associate { it.name to it.value }
 
